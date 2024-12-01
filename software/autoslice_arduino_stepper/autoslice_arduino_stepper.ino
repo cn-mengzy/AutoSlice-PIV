@@ -12,9 +12,10 @@
  * 
  * The motor is used to incrementally scan fluid slices in the AutoSlice-PIV system, enabling detailed flow field analysis.
  * 
- * Author: [Ziyu Meng, University of Bristol]
- * Date: [2024-Dec-01st]
+ * Author: [Ziyu Meng]
+ * Year: [2024]
  */
+ 
 #include <Stepper.h>
 #include <SPI.h>
 
@@ -27,7 +28,8 @@
 
 Stepper steppermotor(32, In1, In3, In2, In4); 
 
-int c,f,b;
+long stepPosition; 
+int motorSpeed;
 
 int matchNumber(String command, String keyword) {
   int start = command.indexOf(keyword);
@@ -62,22 +64,49 @@ void loop() {
       Serial.println(c);
       switch (c) {
 
-        case 2:   
-                  f = matchNumber(message, "f");
-                  Serial.print("f=");
-                  Serial.println(f);
-                  steppermotor.step(f);
-                  break;
-        case 3:
-                  b = -matchNumber(message, "b");
-                  Serial.print("b=");
-                  Serial.println(b);
-                  steppermotor.step(b);
-                  break;
-       case 4:
+        case 1:     // reset home position
                   while (digitalRead(pin_Endstop1)) { // 检测 Endstop1 的状态
                               steppermotor.step(-1); // 反转步进电机 1 步
                           }
+                  stepPosition = 0; 
+                  break;
+
+        case 2:   // move forward s step, if send c2s, then1 s =1 and move 1 step forward
+                  long s = matchNumber(message, "s");
+                  steppermotor.step(s);
+                  stepPosition = stepPosition+s;
+                  break;
+        case 3:   // move backward s step, if send c3s1 then s =-1 and move 1 step backward
+                  s = -matchNumber(message, "s");
+                  steppermotor.step(s);
+                  stepPosition = stepPosition+s;
+                  break;
+       case 4:    // go to postion V; if v = 100, then go to v =100 step;
+                  long v = matchNumber(message, "v");
+                  steppermotor.step(v - stepPosition);
+                  stepPosition = v;
+                  break;
+      case 5:     // go to end position
+                  long stepCount=0;
+                  while (digitalRead(pin_Endstop2)) { // 检测 Endstop2 的状态
+                              steppermotor.step(1); // 正转步进电机 1 步
+                              stepCount++;
+                          }
+                  stepPosition = stepPosition + stepCount;
+                  break;
+      case 6:     // reply ok
+                  Serial.println("ok");
+                  break;
+      case 7:     // setspeed rpms
+                  motorSpeed = matchNumber(message, "s");
+                  if (motorSpeed>=100 & motorSpeed <=800){
+                  steppermotor.setSpeed(motorSpeed);}
+                  break;
+      case 8:     // ask speed
+                  Serial.println(motorSpeed);
+                  break;
+      case 9:     // ask position
+                  Serial.println(stepPosition);
                   break;
        default:
                   Serial.println("Invalid command");
