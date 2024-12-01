@@ -46,50 +46,76 @@ A high-precision, automated indoor Particle Image Velocimetry (PIV) system using
 
 ---
 
-System Requirements
-Operating System: Windows/Linux/macOS
-Python Version: Python 3.8 or higher
-Hardware Requirements:
-Laser source for sheet slicing.
-Stepper motor system for scanning.
-Camera for image capture.
+## **System Requirements**
+
+To run the AutoSlice PIV system, the following requirements must be met:
+
+### **Operating System**
+- Windows, Linux, or macOS
+
+### **Python Version**
+- Python 3.8 or higher
+
+### **Hardware Requirements**
+- **Laser Source**: A laser system capable of generating a sheet for fluid slicing.
+- **Stepper Motor**: A stepper motor system for precise movement and layer-by-layer scanning.
+- **Camera**: A high-resolution camera for capturing flow field images.
+- **Computer**: A computer to run the software, process the data, and control the hardware.
+
+### **Additional Dependencies**
+- Required Python libraries (listed in `requirements.txt`).
+
 
 ---
 
-Hardware Setup
+## **Hardware Setup**
+
 Laser Alignment: Ensure the laser sheet is properly aligned with the scanning area.
 Stepper Motor Calibration: Adjust the stepper motor for consistent layer increments.
 Camera Positioning: Secure the camera to capture the field of interest.
 
 ---
 
-Software Overview
-Modules:
-scanner.py: Handles stepper motor control and scanning logic.
-image_processing.py: Processes captured images for flow field analysis.
-ui.py: Provides a graphical interface for parameter configuration.
-Configuration: Settings can be adjusted in config.yaml
+## **Software Overview**
+
+The software for AutoSlice PIV consists of several key modules that work together to control the system and process the captured data.
+
+### **Modules**
+
+- **`scanner.py`**  
+  This module handles the stepper motor control and the logic for layer-by-layer scanning. It ensures that the motor moves incrementally and accurately, allowing for consistent flow field slicing.
+
+- **`image_processing.py`**  
+  This module processes the images captured during the scanning process. It performs tasks such as particle tracking and flow field analysis to generate high-resolution results.
+
+- **`ui.py`**  
+  This module provides the graphical user interface (GUI) for interacting with the system. It allows users to configure scanning parameters, start the scanning process, and view results in a user-friendly way.
+
+### **Configuration**
+- The software settings, including scanning parameters, can be adjusted via the `config.yaml` configuration file. This file allows you to customize the system's behavior based on your experiment's needs.
 
 ---
 
-Examples
-Example 1: Basic Flow Visualization
+## **Examples**
+
+### **Example 1: Basic Flow Visualization**
 Instructions on setting up and running a test scan for simple flow fields.
 
-Example 2: Advanced Multi-Layer Scanning
+### **Example 2: Advanced Multi-Layer Scanning**
 Detailed steps to perform high-resolution 3D scanning.
 
 ---
 
-Contributing
+## **Contributing**
 Contributions are welcome!
 
-Fork this repository.
-Create a feature branch:
-git checkout -b feature-name
-Commit changes and open a pull request.
+1. Fork this repository.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature-name
+3. Commit changes and open a pull request.
 
 ---
 
-License
+## **License**
 This project is licensed under the Apache License 2.0.
