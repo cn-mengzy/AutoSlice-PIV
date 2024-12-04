@@ -1,5 +1,5 @@
 /*
- * AutoSlice-PIV - Arduino Stepper Motor Control
+ * AutoSlice-PIV - Arduino Stepper Motor Control.
  * 
  * This code is used for controlling a 28BYJ-48 stepper motor using an Arduino Uno.
  * It drives the motor in small steps to control precise movements for the AutoSlice-PIV system.
