@@ -31,14 +31,33 @@ Stepper steppermotor(32, In1, In3, In2, In4);
 long stepPosition, maxPosition; 
 int motorSpeed =100;
 
-int matchNumber(String command, String keyword) {
-  int start = command.indexOf(keyword);
-  if (start != -1) {
-    int end = command.indexOf(" ", start);
-    String num = command.substring(start + keyword.length(), end);
-    return num.toInt();
-  }
-  return -1;
+long matchNumber(String command, String keyword) {
+    int c_start = command.indexOf(keyword);
+        
+    if (c_start != -1) {
+        Serial.println(command);
+        Serial.println(keyword);
+        
+        c_start += keyword.length();  // 移动到关键字之后的数字的开始位置
+        
+        int c_end = c_start;            // 初始化结束位置
+        
+        // 找到数字部分的结束位置
+        while (c_end < command.length() && isDigit(command[c_end])) {
+            c_end++;
+        }
+
+        String numStr = command.substring(c_start, c_end);
+        
+        // 使用strtol从字符串中解析长整型
+        char* endPtr;
+        long num = strtol(numStr.c_str(), &endPtr, 10);
+        
+        if (*endPtr == '\0') {  // 确保整个字符串都是数字
+            return num;
+        }
+    }
+    return -1;  // 如果解析失败或找不到关键字，则返回-1
 }
 
 void showMenu() {
@@ -136,7 +155,7 @@ void loop() {
       }
        else if (c==7){     // setspeed rpms
                   motorSpeed = matchNumber(message, "v");
-                  if (motorSpeed>=100 & motorSpeed <=800){
+                  if (motorSpeed>=100 & motorSpeed <=1000){
                   steppermotor.setSpeed(motorSpeed);}
                   else{
                     Serial.println("speed should between 100 to 800 rpm");
