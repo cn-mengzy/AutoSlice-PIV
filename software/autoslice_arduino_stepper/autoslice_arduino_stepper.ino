@@ -13,6 +13,7 @@
  * The motor is used to incrementally scan fluid slices in the AutoSlice-PIV system, enabling detailed flow field analysis.
  * 
  * Author: [Ziyu Meng]
+ * Company:[University of Bristol]
  * Year: [2024]
  */
  
@@ -29,14 +30,14 @@
 Stepper steppermotor(32, In1, In3, In2, In4); 
 
 long stepPosition, maxPosition; 
-int motorSpeed =100;
+int motorSpeed =300;
 
 long matchNumber(String command, String keyword) {
     int c_start = command.indexOf(keyword);
         
     if (c_start != -1) {
-        Serial.println(command);
-        Serial.println(keyword);
+//        Serial.println(command);
+//        Serial.println(keyword);
         
         c_start += keyword.length();  // 移动到关键字之后的数字的开始位置
         
@@ -100,6 +101,7 @@ void loop() {
                   break;
 
         case 1:     // detect home position and max position
+                  steppermotor.setSpeed(1000);
                   while (digitalRead(pin_Endstop1)) { 
                               steppermotor.step(-1); 
                           }
@@ -110,6 +112,7 @@ void loop() {
                                stepPosition++;
                           }
                   maxPosition = stepPosition;
+                  steppermotor.setSpeed(motorSpeed);
                   break;
 
         case 2:   // move forward s step, if send c2s, then1 s =1 and move 1 step forward
@@ -137,8 +140,27 @@ void loop() {
       else if (c==4){
        // go to postion V; if v = 100, then go to v =100 step;
                   long v = matchNumber(message, "v");
+                 
                   if (v>=0 && v<=maxPosition){
-                  steppermotor.step(v - stepPosition);
+                     long stepsToMove = v - stepPosition; // calculate the step need to move in total
+                     const int maxStep = 30720;
+                     // 2048step = 360 degree 2048*15=30720
+                     //if the motor need to move more than 15 circle then the cmd need to excute in multi steps
+                     //15 circle should be 15*0.5mm=7.5mm(need to verify again)
+
+                      // multi-step system
+                      while (stepsToMove != 0) {
+                          if (stepsToMove > maxStep) {
+                              steppermotor.step(maxStep);   // 正向最大步数
+                              stepsToMove -= maxStep;
+                          } else if (stepsToMove < -maxStep) {
+                              steppermotor.step(-maxStep);  // 反向最大步数
+                              stepsToMove += maxStep;
+                          } else {
+                              steppermotor.step((int)stepsToMove); // 剩余步数
+                              stepsToMove = 0;
+                          }
+                      }
                   stepPosition = v;}
       }
       else if (c==5){     // go to end position
@@ -158,7 +180,7 @@ void loop() {
                   if (motorSpeed>=100 & motorSpeed <=1000){
                   steppermotor.setSpeed(motorSpeed);}
                   else{
-                    Serial.println("speed should between 100 to 800 rpm");
+                    Serial.println("speed should between 100 to 1000 rpm");
                   }
        }
        else if (c==8){    // ask speed
@@ -169,9 +191,5 @@ void loop() {
        }
        else if (c==10){     // ask position
                   Serial.println(maxPosition);
-//       default:
-//                  Serial.println("Invalid command");
-//                  break;}
-     
    }
-}
+}}
